@@ -1,0 +1,31 @@
+name: 📬 Envoi quotidien Telegram
+
+on:
+  schedule:
+    # 5h00 UTC = 7h00 heure de Paris (été CEST UTC+2)
+    # En hiver (CET UTC+1) ce sera 6h00 — ajuste à 6:00 si besoin
+    - cron: "0 5 * * *"
+  workflow_dispatch:  # Permet de lancer manuellement depuis GitHub
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Installer les dépendances
+        run: pip install python-telegram-bot==21.6
+
+      - name: 🚀 Envoyer le message du jour
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          START_DATE: ${{ secrets.START_DATE }}
+        run: python post.py
